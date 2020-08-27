@@ -1,0 +1,13 @@
+<div>
+  <h1>Upcoming Angular Events</h1>
+  <hr />
+  <!-- here [event] should match the inpurt parammeter in the comp. and event1 is matching the current input. -->
+  <!-- here we are passing data from parent component to child component -->
+  <div class="row">
+    <div class="col-sm-5" *ngFor="let event1 of events">
+      <!-- (click)="handleThumbnailClick(event1.name)" -->
+      <event-thumbnail  [event]="event1"></event-thumbnail>
+    </div>
+  </div>
+
+</div>

@@ -1,77 +1,57 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 import { IEvent, ISession } from './event.model';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError } from 'rxjs/operators';
-
-// import { Subject } from 'rxjs/internal/Subject';
 
 @Injectable()
 export class EventService {
-  constructor(private http: HttpClient) { }
-
-
   getEvents(): Observable<IEvent[]> {
-    return this.http.get<IEvent[]>('/api/events')
-    .pipe(catchError(this.handleError<IEvent[]>('getEvents', [])));
+    let subject = new Subject<IEvent[]>();
+    // this method is to asynchrony to the code
+    setTimeout(() => { subject.next(EVENTS); subject.complete(); }, 100);
+    // this is of type observable.
+    return subject;
+
+    // this returns the actual Data.
+    // return EVENTS;
   }
 
-  private handleError<T>(operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
-      console.log(error);
-      return of(result as T);
-    };
-  }
-
-    // let subject = new Subject<IEvent[]>();
-    // setTimeout(() => { subject.next(EVENTS); subject.complete(); } , 100);
-    // return subject;
-  // }
-
-  getEvent(id: number): Observable<IEvent> {
-    return this.http.get<IEvent>('/api/events/' + id)
-    .pipe(catchError(this.handleError<IEvent>('getEvent')));
-
-    // return EVENTS.find(event => event.id === id);
+  getEvent(id: number): IEvent {
+    return EVENTS.find(event => event.id === id );
   }
 
   saveEvent(event) {
-    let options = { headers: new HttpHeaders({'Content-Type': 'application/json'})};
-    return this.http.post<IEvent>('/api/events', event, options)
-    .pipe(catchError(this.handleError<IEvent>('saveEvent')));
+    event.id = 999;
+    event.session = [];
+    EVENTS.push(event);
   }
 
-  // updateEvent(event) {
-  //   let index = EVENTS.findIndex(x => x.id = event.id)
-  //   EVENTS[index] = event;
-  // }
-
-  searchSessions(searchTerm: string): Observable<ISession[]> {
-    return this.http.get<ISession[]>('/api/sessions/search?search=' + searchTerm)
-      .pipe(catchError(this.handleError<ISession[]>('searchSessions')));
-
+  updateEvent(event) {
+    let index = EVENTS.findIndex( x => x.id = event.id );
+    EVENTS[index] = event;
   }
-  //   var term = searchTerm.toLocaleLowerCase();
-  //   var results: ISession[] = [];
 
-  //   EVENTS.forEach( event => {
-  //     var matchingSessions = event.sessions.filter( session =>
-  //       session.name.toLocaleLowerCase().indexOf(term) > -1 );
-  //     matchingSessions = matchingSessions.map((session: any) => {
-  //       session.eventId = event.id;
-  //       return session;
-  //     });
-  //     results = results.concat(matchingSessions);
-  //   });
+  searchSessions(searchTerm: string) {
+    var term = searchTerm.toLocaleLowerCase();
+    var results: ISession[] = [];
 
-  //   var emitter = new EventEmitter(true);
-  //   setTimeout(() => {
-  //     emitter.emit(results);
-  //   }, 100);
-  //   return emitter;
-  // }
+    EVENTS.forEach( event => {
+      var matchingSessions = event.sessions.filter(session =>
+        session.name.toLocaleLowerCase().indexOf(term) > -1);
+      matchingSessions = matchingSessions.map((session: any) => {
+        session.eventId = event.id;
+        return session;
+      });
+      results = results.concat(matchingSessions);
+      })
+
+      var emitter = new EventEmitter(true);
+      setTimeout(() => {
+        emitter.emit(results);
+      }, 100);
+      return emitter;
+  }
+
 }
-
 
 const EVENTS: IEvent[] = [
   {
@@ -92,7 +72,7 @@ const EVENTS: IEvent[] = [
         name: "Using Angular 4 Pipes",
         presenter: "Peter Bacon Darwin",
         duration: 1,
-        level: 'Intermediate',
+        level: "Intermediate",
         abstract: `Learn all about the new pipes in Angular 4, both
         how to write them, and how to get the new AI CLI to write
         them for you. Given by the famous PBD, president of Angular
@@ -101,10 +81,10 @@ const EVENTS: IEvent[] = [
       },
       {
         id: 2,
-        name: "Getting the most out of your dev team",
-        presenter: "Jeff Cross",
+        name: 'Getting the most out of your dev team',
+        presenter: 'Jeff Cross',
         duration: 1,
-        level: "Intermediate",
+        level: 'Intermediate',
         abstract: `We all know that our dev teams work hard, but with
         the right management they can be even more productive, without
         overworking them. In this session I'll show you how to get the
@@ -113,10 +93,10 @@ const EVENTS: IEvent[] = [
       },
       {
         id: 3,
-        name: "Angular 4 Performance Metrics",
-        presenter: "Rob Wormald",
+        name: 'Angular 4 Performance Metrics',
+        presenter: 'Rob Wormald',
         duration: 2,
-        level: "Advanced",
+        level: 'Advanced',
         abstract: `Angular 4 Performance is hot. In this session, we'll see
         how Angular gets such great performance by preloading data on
         your users devices before they even hit your site using the
@@ -126,7 +106,7 @@ const EVENTS: IEvent[] = [
       },
       {
         id: 4,
-        name: "Angular 5 Look Ahead",
+        name: 'Angular 5 Look Ahead',
         presenter: "Brad Green",
         duration: 2,
         level: "Advanced",
@@ -143,7 +123,7 @@ const EVENTS: IEvent[] = [
         name: "Basics of Angular 4",
         presenter: "John Papa",
         duration: 2,
-        level: "Beginner",
+        level: 'Beginner',
         abstract: `It's time to learn the basics of Angular 4. This talk
         will give you everything you need to know about Angular 4 to
         get started with it today and be building UI's for your self
@@ -382,5 +362,5 @@ const EVENTS: IEvent[] = [
       }
     ]
   }
-];
+]
 

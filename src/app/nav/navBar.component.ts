@@ -1,29 +1,34 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../user/auth.service';
-import { ISession, EventService } from '../events';
+import { ISession } from '../events/shared/event.model';
+import { EventService } from '../events/shared/event.service';
 
 @Component({
   selector: 'nav-bar',
-  templateUrl: './navBar.component.html',
+  templateUrl: './navbar.component.html',
   styles: [`
     .nav.navbar-nav { font-size: 15px; }
-    #searchForm: {margin-right: 100px;}
-    @media (max-width: 1200px;) { #searchForm {display: none }}
-    li > a.active  { color: #F97924 }
+    #searchForm { margin-right: 100px; }
+    @media { max-width: 1200px } { #searchForm {display: none}}
+    /* this is not working */
+    ul > li > a.active { color: #F97924 !important ; }
   `]
 })
 
-export class NavBarComponent {
-  searchTerm = ' ';
+export class NavbarComponent {
+  searchTerm: string = '';
   foundSessions: ISession[];
-  constructor(public auth: AuthService, private eventService: EventService) { }
+  constructor( public authService: AuthService, private eventService: EventService) { }
+
+  isAuthenticated() {
+    return this.authService.isAuthenticated();
+  }
 
   searchSessions(searchTerm) {
     this.eventService.searchSessions(searchTerm).subscribe(
       sessions => {
         this.foundSessions = sessions;
-        // console.log(this.foundSessions);
+        console.log(this.foundSessions);
       });
   }
-
 }
